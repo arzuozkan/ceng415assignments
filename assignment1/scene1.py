@@ -22,7 +22,20 @@ class Sphere(Object3D):
         self.color = tuple(np.array(data['group'][0]['sphere']['color']))
 
     def intersect(self,ray,hit=None,tmin=0.001):
-        pass
+        oc = ray.origin - self.centerSphere
+        a = np.dot(ray.direction, ray.direction)
+        b = 2 * np.dot(oc, ray.direction)
+        c = np.dot(oc, oc) - pow(self.radiusSphere, 2)
+        d = (b * b - 4 * a * c)
+        if d < 0:
+            return -1
+        else:
+            d = math.sqrt(d)
+            t1 = (-b + d) / (2 * a)
+            t2 = (-b - d) / (2 * a)
+            if tmin < t1 <= t2:
+                return t1
+            return t2
 
 class Group(Object3D):
 
