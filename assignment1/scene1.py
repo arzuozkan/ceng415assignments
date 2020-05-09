@@ -16,13 +16,13 @@ class Object3D:
         pass
 
 class Sphere(Object3D):
-    def __init__(self,data,ind):
+    def __init__(self,data,ind=0):
         self.radiusSphere = data['group'][ind]['sphere']['radius']
         self.centerSphere = data['group'][ind]['sphere']['center']
-        self.color = tuple(np.array(data['group'][0]['sphere']['color']))
+        self.color = tuple(np.array(data['group'][ind]['sphere']['color']))
 
     def intersect(self,ray,hit=None,tmin=0.001):
-        oc = ray.origin - self.centerSphere
+        oc=ray.origin-self.centerSphere
         a = np.dot(ray.direction, ray.direction)
         b = 2 * np.dot(oc, ray.direction)
         c = np.dot(oc, oc) - pow(self.radiusSphere, 2)
@@ -34,8 +34,11 @@ class Sphere(Object3D):
             t1 = (-b + d) / (2 * a)
             t2 = (-b - d) / (2 * a)
             if tmin < t1 <= t2:
-                return t1
-            return t2
+                t=t1
+            t=t2
+            hit.t = t
+            h.color = self.color
+            return t
 
 class Group(Object3D):
 
@@ -61,7 +64,9 @@ class OrthographicCamera(Camera):
         self.size=data['orthocamera']['size']
 
     def generateRay(self, x, y):
-        pass
+        horizontal = np.cross(self.dir, self.up)
+        return (self.center + (x - 0.5) * self.size * horizontal + (y - 0.5) * self.size * self.up)
+
 
 class Ray:
     def __init__(self, origin, direction):
@@ -88,11 +93,25 @@ if __name__ == '__main__':
     back_color = np.array(data['background']['color'])
     # objects
     orthcam = OrthographicCamera(data)
-    s = Sphere(data, 0)
+    s = Sphere(data)
     h = Hit()
     h_d = Hit()
     im = Image.new('RGB', SIZE, tuple(back_color))
 
     #pixels
     pixel = im.load()
+
+    # ray tracing for every pixel
+    for i in range(SIZE[0]):
+        for j in range(SIZE[1]):
+            x, y = findNormalize(i, j, SIZE)
+            r=orthcam.generateRay(x,y)
+            ray = Ray(r,orthcam.dir)
+            t = s.intersect(ray,h)
+            # make control the t whether there is a hit
+            if t != -1:
+                pixel[i, j] = tuple(h.color)
+            else:
+                pixel[i,j]=tuple(back_color)
+    im.show()
     print("OK")
