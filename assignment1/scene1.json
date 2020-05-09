@@ -1,0 +1,20 @@
+{
+	"orthocamera" : {
+		"center" : [0, 0, 10],
+		"direction" : [0, 0, -1],
+		"up" : [0, 1, 0],
+		"size" : 5
+	},
+	"background" : {
+		"color" : [0, 0, 0]
+	},
+	"group" : [
+		{
+			"sphere" : {
+				"center" : [0, 0, 0],
+				"radius" : 1,
+				"color" : [200, 200, 50]
+			}
+		}
+	]
+}
