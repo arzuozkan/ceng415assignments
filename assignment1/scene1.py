@@ -79,17 +79,58 @@ class Hit:
         self.t = t
         self.color = color
 
-#normalization
+
+# normalization
 def findNormalize(x, y, size):
     return ((x + 0.5) / size[0], (y + 0.5) / size[1])
 
 
+def rayTracingColor(image, hit):
+    pixel = image.load()
+    # ray tracing for every pixel
+    for i in range(SIZE[0]):
+        for j in range(SIZE[1]):
+            x, y = findNormalize(i, j, SIZE)
+            r = orthcam.generateRay(x, y)
+            ray = Ray(r, orthcam.dir)
+            t = s.intersect(ray, hit)
+            # make control the t whether there is a hit
+            if t != -1:
+                hit.color = s.color
+                pixel[i, j] = tuple(hit.color)
+            else:
+                pixel[i, j] = tuple(back_color)
+    image.show()
+
+
+def rayTracingDepth(image, hit):
+    # pixels
+    pixel = image.load()
+    # ray tracing for every pixel
+    near = 9
+    far = 11
+    for i in range(SIZE[0]):
+        for j in range(SIZE[1]):
+            x, y = findNormalize(i, j, SIZE)
+            r = orthcam.generateRay(x, y)
+            ray = Ray(r, orthcam.dir)
+            t = s.intersect(ray, hit)
+            # make control the t whether there is a hit
+            if t != -1:
+                depth = int(round((far - t) / (far - near) * 255) - 1)
+                hit.color = (depth, depth, depth)
+                pixel[i, j] = hit.color
+            else:
+                pixel[i, j] = tuple(back_color)
+    image.show()
+
+
 if __name__ == '__main__':
-    #read the json file
+    # read the json file
     with open('scene1.json') as f:
         data = json.load(f)
 
-    SIZE=(250,250)
+    SIZE = (250, 250)
     back_color = np.array(data['background']['color'])
     # objects
     orthcam = OrthographicCamera(data)
@@ -98,20 +139,6 @@ if __name__ == '__main__':
     h_d = Hit()
     im = Image.new('RGB', SIZE, tuple(back_color))
 
-    #pixels
-    pixel = im.load()
-
-    # ray tracing for every pixel
-    for i in range(SIZE[0]):
-        for j in range(SIZE[1]):
-            x, y = findNormalize(i, j, SIZE)
-            r=orthcam.generateRay(x,y)
-            ray = Ray(r,orthcam.dir)
-            t = s.intersect(ray,h)
-            # make control the t whether there is a hit
-            if t != -1:
-                pixel[i, j] = tuple(h.color)
-            else:
-                pixel[i,j]=tuple(back_color)
-    im.show()
+    rayTracingColor(im, h)
+    rayTracingDepth(im, h)
     print("OK")
