@@ -32,13 +32,14 @@ class Sphere(Object3D):
             return -1
         else:
             d = math.sqrt(d)
+            # print("a,b,c,d,", a, b, c, d)
             t1 = (-b + d) / (2 * a)
             t2 = (-b - d) / (2 * a)
             if tmin < t1 <= t2:
                 t = t1
             t = t2
             hit.t = t
-            hit.color = self.color
+            h.color = self.color
             return t
 
 
@@ -51,21 +52,23 @@ class Group(Object3D):
         self.objects.append(sphere)
 
     def intersect(self, ray, hit, tmin=0):
-        hit_tmp = []
+        hit_tmp = {}
         for s in self.objects:
-            hit_tmp.append(s.intersect(ray, hit))
-        print("hit_tmp: ", hit_tmp)
-        print(np.mean(hit_tmp))
-        if np.mean(hit_tmp) != -1:
-            min_t = min(hit_tmp)
-            print("min_t: ", min_t)
-            hit.t = min_t
-            hit.color = self.objects[hit_tmp.index(min_t)].color
-            return min_t
-        else:
+            t_tmp = s.intersect(ray, hit)
+            if (t_tmp != -1):
+                hit_tmp[self.objects.index(s)] = -t_tmp
+        if len(hit_tmp) == 0:
             hit.color = back_color
             return -1
-
+        else:
+            print("hit_tmp, ", list(hit_tmp.values()))
+            min_t = min(list(hit_tmp.values()))
+            print("mint,", min_t)
+            hit.t = min_t
+            index = list(hit_tmp.keys())[list(hit_tmp.values()).index(min_t)]
+            hit.color = self.objects[index].color
+            print("hit.t,hit.color,", hit.t, hit.color)
+            return min_t
 
 class Camera:
     def generateRay(x, y):
@@ -109,9 +112,10 @@ def rayTracingColor(image, hit, g):
             x, y = findNormalize(i, j, SIZE)
             r = orthcam.generateRay(x, y)
             ray = Ray(r, orthcam.dir)
-            g.intersect(ray, hit)
+            t = g.intersect(ray, hit)
             # make control the t whether there is a hit
-            if h.t != -1:
+            if t != -1:
+                # print("hit.color,",hit.color)
                 pixel[i, j] = tuple(hit.color)
             else:
                 pixel[i, j] = tuple(back_color)
@@ -122,8 +126,8 @@ def rayTracingDepth(image, hit, g):
     # pixels
     pixel = image.load()
     # ray tracing for every pixel
-    near = 9
-    far = 11
+    near = 8
+    far = 11.5
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
             x, y = findNormalize(i, j, SIZE)
@@ -132,11 +136,12 @@ def rayTracingDepth(image, hit, g):
             t = g.intersect(ray, hit)
             # make control the t whether there is a hit
             if t != -1:
-                depth = int(round((far - t) / (far - near) * 255) - 1)
+                depth = abs(int(round((far - hit.t) / (far - near) * 255) - 1))
                 hit.color = (depth, depth, depth)
-                pixel[i, SIZE[0] - j - 1] = hit.color
+                print("hit.color,", hit.color)
+                pixel[i, j] = hit.color
             else:
-                pixel[i, SIZE[0] - j - 1] = tuple(back_color)
+                pixel[i, j] = tuple(back_color)
     image.show()
 
 
@@ -150,7 +155,7 @@ if __name__ == '__main__':
     with open('scene2.json') as f:
         data = json.load(f)
 
-    SIZE = (250, 250)
+    SIZE = (100, 100)
     back_color = np.array(data['background']['color'])
     # objects
     orthcam = OrthographicCamera(data)
@@ -161,5 +166,5 @@ if __name__ == '__main__':
     makeGroup(groupSphere, data)
 
     rayTracingColor(im, h, groupSphere)
-    # rayTracingDepth(im, h)
+    rayTracingDepth(im, h, groupSphere)
     print("OK")

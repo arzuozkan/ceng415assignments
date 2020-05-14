@@ -45,12 +45,11 @@ class Group(Object3D):
     def __init__(self, object):
         self.objects=[]
 
-    def appendSphere(self,sphere):
+    def addSphere(self, sphere):
         self.objects.append(sphere)
 
     def intersect(self,ray, hit, tmin=0):
             pass
-
 class Camera:
     def generateRay(x, y):
         pass
@@ -85,25 +84,25 @@ def findNormalize(x, y, size):
     return ((x + 0.5) / size[0], (y + 0.5) / size[1])
 
 
-def rayTracingColor(image, hit):
+def rayTracingColor(image, hit, sphere, orthcamera):
     pixel = image.load()
     # ray tracing for every pixel
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
             x, y = findNormalize(i, j, SIZE)
-            r = orthcam.generateRay(x, y)
-            ray = Ray(r, orthcam.dir)
-            t = s.intersect(ray, hit)
+            r = orthcamera.generateRay(x, y)
+            ray = Ray(r, orthcamera.dir)
+            t = sphere.intersect(ray, hit)
             # make control the t whether there is a hit
             if t != -1:
                 hit.color = s.color
                 pixel[i, j] = tuple(hit.color)
             else:
                 pixel[i, j] = tuple(back_color)
-    image.show()
+    image.save("scene1.jpg")
 
 
-def rayTracingDepth(image, hit):
+def rayTracingDepth(image, hit, sphere, orthcamera):
     # pixels
     pixel = image.load()
     # ray tracing for every pixel
@@ -112,9 +111,9 @@ def rayTracingDepth(image, hit):
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
             x, y = findNormalize(i, j, SIZE)
-            r = orthcam.generateRay(x, y)
-            ray = Ray(r, orthcam.dir)
-            t = s.intersect(ray, hit)
+            r = orthcamera.generateRay(x, y)
+            ray = Ray(r, orthcamera.dir)
+            t = sphere.intersect(ray, hit)
             # make control the t whether there is a hit
             if t != -1:
                 depth = int(round((far - t) / (far - near) * 255) - 1)
@@ -122,7 +121,7 @@ def rayTracingDepth(image, hit):
                 pixel[i, j] = hit.color
             else:
                 pixel[i, j] = tuple(back_color)
-    image.show()
+    image.save("scene1_depth.jpg")
 
 
 if __name__ == '__main__':
@@ -136,9 +135,8 @@ if __name__ == '__main__':
     orthcam = OrthographicCamera(data)
     s = Sphere(data)
     h = Hit()
-    h_d = Hit()
     im = Image.new('RGB', SIZE, tuple(back_color))
 
-    rayTracingColor(im, h)
-    rayTracingDepth(im, h)
+    rayTracingColor(im, h, s, orthcam)
+    rayTracingDepth(im, h, s, orthcam)
     print("OK")
