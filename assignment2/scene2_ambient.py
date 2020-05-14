@@ -103,8 +103,6 @@ if __name__ == '__main__':
 
     # variables
     SIZE = (250, 250)
-    near = 9
-    far = 11
 
     back_color = np.array(data['background']['color'])
     ambient = np.array(data['background']['ambient'])
