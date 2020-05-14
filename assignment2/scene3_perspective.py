@@ -99,8 +99,14 @@ class PerspectiveCamera(Camera):
         self.angle = data["perspectivecamera"]['angle']
 
     def generateRay(self, x, y):
-        horizontal = np.cross(self.dir, self.up)
-        return self.center + (x - 0.5) * math.tan(self.angle) * horizontal + (y - 0.5) * math.tan(self.angle) * self.up
+        horizontal = np.cross(self.dir * -1, self.up)
+        righttop = self.center + math.tan(self.angle / 2) * self.up + math.tan(self.angle / 2) * horizontal
+        leftbottom = self.center - math.tan(self.angle / 2) * self.up - math.tan(self.angle / 2) * horizontal
+        print("righttop", righttop)
+        print("leftbottom,", leftbottom)
+        print("x: ", (x - 0.5) * leftbottom * SIZE[0])
+        print("y: ", (y - 0.5) * righttop * SIZE[1])
+        return (x - 0.5) * leftbottom * SIZE[0] + (y - 0.5) * righttop * SIZE[1]
 
 
 class Ray:
@@ -114,11 +120,6 @@ class Hit:
         self.t = t
         self.color = color
         self.normal = normal
-
-    def findNormal(self, x, y, z):
-        magnitude = math.sqrt(x * x + y * y + z * z)
-        return x / magnitude, y / magnitude, z / magnitude
-
 
 # normalization
 def findNormalize(x, y, size):
@@ -140,7 +141,7 @@ if __name__ == '__main__':
         data = json.load(f)
 
     # variables
-    SIZE = (250, 250)
+    SIZE = (100, 100)
     back_color = np.array(data['background']['color'])
     ambient = np.array(data['background']['ambient'])
     light_dir = np.array(data['light']['direction']) * -1
@@ -168,7 +169,7 @@ for i in range(SIZE[0]):
         if t != -1:
             pixel_color = np.array(ambient * h.color + max(np.dot(light_dir, h.normal), 0) * h.color * light_color)
             pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
-            print(pixel[i, SIZE[0] - j - 1])
+            # print(pixel[i, SIZE[0] - j - 1])
         else:
             pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
 im.show()
