@@ -116,7 +116,7 @@ def rayTracingColor(image, hit, g):
                 pixel[i, j] = tuple(hit.color)
             else:
                 pixel[i, j] = tuple(back_color)
-    image.show()
+    image.save("scene2.jpg")
 
 
 def rayTracingDepth(image, hit, g):
@@ -138,7 +138,7 @@ def rayTracingDepth(image, hit, g):
                 pixel[i, j] = hit.color
             else:
                 pixel[i, j] = tuple(back_color)
-    image.show()
+    image.save("scene2_depth.jpg")
 
 
 def makeGroup(group, data):
@@ -163,4 +163,3 @@ if __name__ == '__main__':
 
     rayTracingColor(im, h, groupSphere)
     rayTracingDepth(im, h, groupSphere)
-    print("OK")
