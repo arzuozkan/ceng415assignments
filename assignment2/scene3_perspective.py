@@ -57,24 +57,6 @@ class Group(Object3D):
         for s in self.objects:
             s.intersect(ray, hit)
 
-    """def intersect(self, ray, hit, tmin=0):
-        hit_tmp = {}
-        for s in self.objects:
-            t_tmp = s.intersect(ray, hit)
-            if t_tmp != -1:
-                hit_tmp[self.objects.index(s)] = t_tmp
-        if len(hit_tmp) == 0:
-            hit.color = back_color
-            return -1
-        else:
-            min_t = min(list(hit_tmp.values()))
-
-            hit.t = min_t
-            index = list(hit_tmp.keys())[list(hit_tmp.values()).index(min_t)]
-            hit.color = self.objects[index].color
-            return min_t
-"""
-
 class Camera:
     def generateRay(x, y):
         pass
