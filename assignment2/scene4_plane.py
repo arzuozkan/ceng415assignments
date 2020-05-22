@@ -9,11 +9,12 @@ from PIL import Image
 
 T_MAX = 999.0
 
+
 class Object3D:
     def __init__(self, color):
         self.color = color
 
-    def intersect(ray, hit=0, tmin=0):
+    def intersect(ray, hit, tmin=0.001):
         pass
 
 
@@ -24,7 +25,7 @@ class Sphere(Object3D):
         self.centerSphere = data['group'][ind]['sphere']['center']
         self.color = np.array(data['group'][ind]['sphere']['color'])
 
-    def intersect(self, ray, hit, tmin=0.01):
+    def intersect(self, ray, hit, tmin=0.001):
         oc = ray.origin - self.centerSphere
         a = np.dot(ray.direction, ray.direction)
         b = 2 * np.dot(oc, ray.direction)
@@ -43,20 +44,35 @@ class Sphere(Object3D):
             if t < hit.t:
                 hit.t = t
                 hit.color = self.color
-                vector = ray.origin + t * ray.direction - self.centerSphere
-                hit.normal = normVector(vector)
+                hit.normal = normVector(ray.origin + t * ray.direction - self.centerSphere)
+
+
+class Plane(Object3D):
+    def __init__(self, data, ind):
+        self.normal = np.array(data["group"][ind]["plane"]["normal"])
+        self.d = data["group"][ind]["plane"]["offset"]
+        self.color = np.array(data["group"][ind]["plane"]["color"])
+
+    def intersect(self, ray, hit, tmin=0.001):
+        t = (self.d + np.dot(self.normal, ray.origin)) / np.dot(self.normal, ray.direction)
+        if t < hit.t and t > tmin:
+            hit.t = t
+            hit.color = self.color
+            hit.normal = self.normal
+
 
 class Group(Object3D):
 
     def __init__(self):
         self.objects = []
 
-    def addSphere(self, sphere):
-        self.objects.append(sphere)
+    def addObject(self, object):
+        self.objects.append(object)
 
     def intersect(self, ray, hit, tmin=0):
         for s in self.objects:
             s.intersect(ray, hit)
+
 
 class Camera:
     def generateRay(x, y):
@@ -95,6 +111,7 @@ class PerspectiveCamera(Camera):
         direction = leftbottom + x * size * horizontal + y * size * self.up - self.center
         return self.center, normVector(direction)
 
+
 class Ray:
     def __init__(self, origin, direction):
         self.origin = origin
@@ -107,6 +124,7 @@ class Hit:
         self.color = color
         self.normal = normal
 
+
 # normalization
 def findNormalize(x, y, size):
     return ((x + 0.5) / size[0], (y + 0.5) / size[1])
@@ -116,14 +134,16 @@ def normVector(v):
     return v / np.linalg.norm(v)
 
 
-def makeGroup(group, data):
-    for i in range(5):
-        group.addSphere(Sphere(data, i))
+def makeGroup(group, sphereNum, data):
+    for i in range(sphereNum):
+        group.addObject(Sphere(data, i))
+    group.addObject(Plane(data, 5))
 
 
 if __name__ == '__main__':
+
     # read the json file
-    with open('scene3_perspective.json') as f:
+    with open('scene4_plane.json') as f:
         data = json.load(f)
 
     # variables
@@ -135,10 +155,12 @@ if __name__ == '__main__':
 
     # objects
     pcam = PerspectiveCamera(data)
+    # plane=Plane(data,5)
     group = Group()
 
     im = Image.new('RGB', SIZE, tuple(np.array(back_color).dot(255).astype(int)))
-    makeGroup(group, data)
+    makeGroup(group, 5, data)
+
     # pixels
     pixel = im.load()
 
@@ -152,9 +174,12 @@ if __name__ == '__main__':
             group.intersect(ray, h)
 
             # make control the t whether there is a hit.
-            if h.t < T_MAX:
-                pixel_color = np.array(ambient * h.color + max(np.dot(light_dir, h.normal), 0) * h.color * light_color)
+            if h.t < T_MAX - 1:
+                result = np.dot(light_dir, h.normal)
+                print("result", result)
+                pixel_color = np.array(ambient * h.color + max(result, 0) * h.color * light_color)
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    im.save("scene3_perspective.jpg")
+    # im.save("scene3_perspective.jpg")
+    im.show()
