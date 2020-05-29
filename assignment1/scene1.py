@@ -34,8 +34,9 @@ class Sphere(Object3D):
             t1 = (-b + d) / (2 * a)
             t2 = (-b - d) / (2 * a)
             if tmin < t1 <= t2:
-                t=t1
-            t=t2
+                t = t1
+            else:
+                t = t2
             hit.t = t
             h.color = self.color
             return t
@@ -81,14 +82,15 @@ class Hit:
 
 # normalization
 def findNormalize(x, y, size):
-    return ((x + 0.5) / size[0], (y + 0.5) / size[1])
+    return (x + 0.5) / size[0], (y + 0.5) / size[1]
 
 
-def rayTracingColor(image, hit, sphere, orthcamera):
+def rayTracingColor(image, sphere, orthcamera):
     pixel = image.load()
     # ray tracing for every pixel
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
+            hit = Hit()
             x, y = findNormalize(i, j, SIZE)
             r = orthcamera.generateRay(x, y)
             ray = Ray(r, orthcamera.dir)
@@ -102,7 +104,7 @@ def rayTracingColor(image, hit, sphere, orthcamera):
     image.save("scene1.jpg")
 
 
-def rayTracingDepth(image, hit, sphere, orthcamera):
+def rayTracingDepth(image, sphere, orthcamera):
     # pixels
     pixel = image.load()
     # ray tracing for every pixel
@@ -110,6 +112,7 @@ def rayTracingDepth(image, hit, sphere, orthcamera):
     far = 11
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
+            hit = Hit()
             x, y = findNormalize(i, j, SIZE)
             r = orthcamera.generateRay(x, y)
             ray = Ray(r, orthcamera.dir)
@@ -137,6 +140,5 @@ if __name__ == '__main__':
     h = Hit()
     im = Image.new('RGB', SIZE, tuple(back_color))
 
-    rayTracingColor(im, h, s, orthcam)
-    rayTracingDepth(im, h, s, orthcam)
-    print("OK")
+    rayTracingColor(im, s, orthcam)
+    rayTracingDepth(im, s, orthcam)

@@ -1,11 +1,7 @@
-# CENG 415 Applications of Computer Graphics
-# Student: Arzu ÖZKAN 16050111051
-# Assignment 1
-
 import json
 import numpy as np
 import math
-from PIL import Image, ImageDraw
+from PIL import Image
 
 T_MAX = 999.0
 
@@ -86,56 +82,10 @@ class Hit:
         self.t = t
         self.color = color
 
+
 # normalization
 def findNormalize(x, y, size):
     return (x + 0.5) / size[0], (y + 0.5) / size[1]
-
-
-def rayTracingColor(image, g):
-    pixel = image.load()
-    # ray tracing for every pixel
-    for i in range(SIZE[0]):
-        for j in range(SIZE[1]):
-            hit = Hit()
-            x, y = findNormalize(i, j, SIZE)
-            r = orthcam.generateRay(x, y)
-            ray = Ray(r, orthcam.dir)
-            g.intersect(ray, hit)
-            # make control the t whether there is a hit
-            if hit.t < T_MAX - 1:
-                # print("hit.color,",hit.color)
-                pixel[i, j] = tuple(hit.color)
-            else:
-                pixel[i, j] = tuple(back_color)
-    image.save("scene2.jpg")
-
-
-def rayTracingDepth(image, g):
-    # pixels
-    pixel = image.load()
-    # ray tracing for every pixel
-    near = 8
-    far = 11.5
-    for i in range(SIZE[0]):
-        for j in range(SIZE[1]):
-            hit = Hit()
-            x, y = findNormalize(i, j, SIZE)
-            r = orthcam.generateRay(x, y)
-            ray = Ray(r, orthcam.dir)
-            g.intersect(ray, hit)
-            # make control the t whether there is a hit
-            if hit.t < T_MAX - 1:
-                depth = abs(int(round((far - hit.t) / (far - near) * 255) - 1))
-                hit.color = (depth, depth, depth)
-                pixel[i, j] = hit.color
-            else:
-                pixel[i, j] = tuple(back_color)
-    image.save("scene2_depth.jpg")
-
-
-def makeGroup(group, data):
-    for i in range(5):
-        group.addSphere(Sphere(data, i))
 
 
 if __name__ == '__main__':
@@ -150,8 +100,3 @@ if __name__ == '__main__':
     groupSphere = Group()
     h = Hit()
     im = Image.new('RGB', SIZE, tuple(back_color))
-
-    makeGroup(groupSphere, data)
-
-    rayTracingColor(im, groupSphere)
-    rayTracingDepth(im, groupSphere)

@@ -36,7 +36,8 @@ class Sphere(Object3D):
             t2 = (-b - d) / (2 * a)
             if tmin < t1 <= t2:
                 t = t1
-            t = t2
+            else:
+                t = t2
             hit.t = t
             hit.color = self.color
             vector = ray.origin + t * ray.direction - self.centerSphere
@@ -133,4 +134,4 @@ if __name__ == '__main__':
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    im.show()
+    im.save("scene2_ambient.jpg")

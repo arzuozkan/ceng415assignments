@@ -109,7 +109,7 @@ class Hit:
 
 # normalization
 def findNormalize(x, y, size):
-    return ((x + 0.5) / size[0], (y + 0.5) / size[1])
+    return (x + 0.5) / size[0], (y + 0.5) / size[1]
 
 
 def normVector(v):
