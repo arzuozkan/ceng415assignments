@@ -128,4 +128,4 @@ if __name__ == '__main__':
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
 
-    im.show()
+    im.save("scene1_diffuse.jpg")

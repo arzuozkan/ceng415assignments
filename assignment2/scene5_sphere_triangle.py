@@ -14,7 +14,7 @@ class Object3D:
     def __init__(self, color):
         self.color = color
 
-    def intersect(ray, hit, tmin=0.001):
+    def intersect(self, ray, hit, tmin=0.001):
         pass
 
 
@@ -47,18 +47,39 @@ class Sphere(Object3D):
                 hit.normal = normVector(ray.origin + t * ray.direction - self.centerSphere)
 
 
-class Plane(Object3D):
+class Triangle(Object3D):
+
     def __init__(self, data, ind):
-        self.normal = np.array(data["group"][ind]["plane"]["normal"])
-        self.d = data["group"][ind]["plane"]["offset"]
-        self.color = np.array(data["group"][ind]["plane"]["color"])
+        self.v1 = np.array(data["group"][ind]["triangle"]["v1"])
+        self.v2 = np.array(data["group"][ind]["triangle"]["v2"])
+        self.v3 = np.array(data["group"][ind]["triangle"]["v3"])
+        self.color = np.array(data["group"][ind]["triangle"]["color"])
 
     def intersect(self, ray, hit, tmin=0.001):
-        t = (self.d + np.dot(self.normal, ray.origin)) / np.dot(self.normal, ray.direction)
-        if t < hit.t and t > tmin:
+        normal = findNormalTriangle(self.v1, self.v2, self.v3)
+
+        # edges
+        v1v2 = self.v2 - self.v1
+        v1v3 = self.v3 - self.v1
+        p = np.cross(ray.direction, v1v3)
+        d = np.dot(v1v2, p)
+        if d < 1e-8:
+            return False
+
+        inverseD = 1 / d
+        tvector = ray.origin - self.v1
+        u = np.dot(tvector, p) * inverseD
+        if u < 0 or u > 1:
+            return False
+        q = np.cross(tvector, v1v2)
+        v = np.dot(ray.direction, q) * inverseD
+        if v < 0 or u + v > 1:
+            return False
+        t = np.dot(v1v3, q) * inverseD
+        if t > 0 and t < hit.t:
             hit.t = t
+            hit.normal = normal
             hit.color = self.color
-            hit.normal = self.normal
 
 
 class Group(Object3D):
@@ -75,22 +96,8 @@ class Group(Object3D):
 
 
 class Camera:
-    def generateRay(x, y):
-        pass
-
-
-# Orthographic camera
-class OrthographicCamera(Camera):
-
-    def __init__(self, data):
-        self.center = np.array(data['orthocamera']['center'])
-        self.dir = np.array(data['orthocamera']['direction'])
-        self.up = np.array(data['orthocamera']['up'])
-        self.size = data['orthocamera']['size']
-
     def generateRay(self, x, y):
-        horizontal = np.cross(self.dir * -1, self.up)
-        return self.center + (x - 0.5) * self.size * horizontal + (y - 0.5) * self.size * self.up
+        pass
 
 
 # Perspective Camera
@@ -102,13 +109,13 @@ class PerspectiveCamera(Camera):
         self.angle = data["perspectivecamera"]['angle']
 
     def generateRay(self, x, y):
-        distance_fromcam = 1;
+        distance_from_cam = 1
         horizontal = np.cross(self.dir, self.up)
         radian_angle = self.angle * math.pi / 180
-        leftbottom = self.center + self.dir * distance_fromcam - math.tan(radian_angle / 2) * self.up - math.tan(
+        left_bottom = self.center + self.dir * distance_from_cam - math.tan(radian_angle / 2) * self.up - math.tan(
             radian_angle / 2) * horizontal
-        size = 2 * distance_fromcam * math.tan(radian_angle / 2)
-        direction = leftbottom + x * size * horizontal + y * size * self.up - self.center
+        size = 2 * distance_from_cam * math.tan(radian_angle / 2)
+        direction = left_bottom + x * size * horizontal + y * size * self.up - self.center
         return self.center, normVector(direction)
 
 
@@ -125,25 +132,30 @@ class Hit:
         self.normal = normal
 
 
-# normalization
-def findNormalize(x, y, size):
-    return ((x + 0.5) / size[0], (y + 0.5) / size[1])
+def findNormalTriangle(v1, v2, v3):
+    v1v2 = v2 - v1
+    v1v3 = v3 - v2
+    return np.cross(v1v2, v1v3)
 
 
 def normVector(v):
     return v / np.linalg.norm(v)
 
 
-def makeGroup(group, sphereNum, data):
-    for i in range(sphereNum):
-        group.addObject(Sphere(data, i))
-    group.addObject(Plane(data, 5))
+# normalization
+def findNormalize(x, y, size):
+    return (x + 0.5) / size[0], (y + 0.5) / size[1]
+
+
+def makeGroup(group, data):
+    group.addObject(Sphere(data, 0))
+    group.addObject(Triangle(data, 1))
 
 
 if __name__ == '__main__':
 
     # read the json file
-    with open('scene4_plane.json') as f:
+    with open('scene5_sphere_triangle.json') as f:
         data = json.load(f)
 
     # variables
@@ -155,11 +167,10 @@ if __name__ == '__main__':
 
     # objects
     pcam = PerspectiveCamera(data)
-    # plane=Plane(data,5)
     group = Group()
 
     im = Image.new('RGB', SIZE, tuple(np.array(back_color).dot(255).astype(int)))
-    makeGroup(group, 5, data)
+    makeGroup(group, data)
 
     # pixels
     pixel = im.load()
@@ -180,5 +191,5 @@ if __name__ == '__main__':
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    # im.save("scene4_plane.jpg")
+    # im.save("scene5_sphere_triangle.jpg")
     im.show()
