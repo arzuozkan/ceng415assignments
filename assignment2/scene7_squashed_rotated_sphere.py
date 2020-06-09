@@ -121,7 +121,7 @@ if __name__ == '__main__':
     with open('scene7_squashed_rotated_sphere.json') as f:
         data = json.load(f)
 
-    SIZE = (100, 100)
+    SIZE = (250, 250)
     back_color = np.array(data['background']['color'])
     ambient = np.array(data['background']['ambient'])
     light_dir = np.array(data['light']['direction']) * -1
