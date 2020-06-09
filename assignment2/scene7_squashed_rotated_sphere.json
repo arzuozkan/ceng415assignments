@@ -1,0 +1,77 @@
+{
+  "orthocamera": {
+    "center": [
+      0,
+      0,
+      10
+    ],
+    "direction": [
+      0,
+      0,
+      -1
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
+    "size": 2.5
+  },
+  "background": {
+    "color": [
+      0.2,
+      0,
+      0.6
+    ],
+    "ambient": [
+      0,
+      0,
+      0
+    ]
+  },
+  "light": {
+    "direction": [
+      -0.2,
+      -0.2,
+      -1
+    ],
+    "color": [
+      1,
+      1,
+      1
+    ]
+  },
+  "group": [
+    {
+      "transform": {
+        "transformations": [
+          {
+            "zrotate": 45
+          },
+          {
+            "scale": [
+              1,
+              0.2,
+              1
+            ]
+          }
+        ],
+        "object": {
+          "sphere": {
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "radius": 1,
+            "color": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

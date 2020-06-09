@@ -1,5 +1,6 @@
 # CENG 415 Applications of Computer Graphics
-# Assignment 2
+# Student: Arzu ÖZKAN 16050111051
+# Assignment 2, Perspective Camera
 
 import json
 import numpy as np
@@ -78,20 +79,6 @@ class Camera:
         pass
 
 
-# Orthographic camera
-class OrthographicCamera(Camera):
-
-    def __init__(self, data):
-        self.center = np.array(data['orthocamera']['center'])
-        self.dir = np.array(data['orthocamera']['direction'])
-        self.up = np.array(data['orthocamera']['up'])
-        self.size = data['orthocamera']['size']
-
-    def generateRay(self, x, y):
-        horizontal = np.cross(self.dir * -1, self.up)
-        return self.center + (x - 0.5) * self.size * horizontal + (y - 0.5) * self.size * self.up
-
-
 # Perspective Camera
 class PerspectiveCamera(Camera):
     def __init__(self, data):
@@ -122,6 +109,24 @@ class Hit:
         self.t = t
         self.color = color
         self.normal = normal
+
+
+class Light():
+    def __init__(self, color):
+        self.color = color
+
+
+class DirectionalLight(Light):
+
+    def __init__(self, data):
+        super().__init__(np.array(data["lights"]["directionalLight"]["color"]))
+        self.direction = np.array(data["lights"]["directionalLight"]["direction"])
+
+
+class Material():
+
+    def __init__(self, diffuseColor):
+        pass
 
 
 # normalization
@@ -179,4 +184,5 @@ if __name__ == '__main__':
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    im.save("scene4_plane.jpg")
+    # im.save("scene2_plane_sphere.jpg")
+    im.show()

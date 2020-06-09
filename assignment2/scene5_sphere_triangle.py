@@ -1,6 +1,5 @@
 # CENG 415 Applications of Computer Graphics
-# Student: Arzu ÖZKAN 16050111051
-# Assignment 2, Perspective Camera
+# Assignment 2
 
 import json
 import numpy as np
@@ -61,21 +60,21 @@ class Triangle(Object3D):
         # edges
         v1v2 = self.v2 - self.v1
         v1v3 = self.v3 - self.v1
+
         p = np.cross(ray.direction, v1v3)
         d = np.dot(v1v2, p)
         if d < 1e-8:
             return False
 
-        inverseD = 1 / d
         tvector = ray.origin - self.v1
-        u = np.dot(tvector, p) * inverseD
+        u = np.dot(tvector, p) / d
         if u < 0 or u > 1:
             return False
         q = np.cross(tvector, v1v2)
-        v = np.dot(ray.direction, q) * inverseD
+        v = np.dot(ray.direction, q) / d
         if v < 0 or u + v > 1:
             return False
-        t = np.dot(v1v3, q) * inverseD
+        t = np.dot(v1v3, q) / d
         if t > 0 and t < hit.t:
             hit.t = t
             hit.normal = normal
@@ -191,5 +190,4 @@ if __name__ == '__main__':
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    # im.save("scene5_sphere_triangle.jpg")
-    im.show()
+    im.save("scene5_sphere_triangle.jpg")

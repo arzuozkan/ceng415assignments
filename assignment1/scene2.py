@@ -1,5 +1,4 @@
 # CENG 415 Applications of Computer Graphics
-# Student: Arzu ÖZKAN 16050111051
 # Assignment 1
 
 import json

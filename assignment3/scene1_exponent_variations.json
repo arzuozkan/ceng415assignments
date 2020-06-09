@@ -1,0 +1,282 @@
+{
+  "orthocamera": {
+    "center": [
+      0,
+      0,
+      10
+    ],
+    "direction": [
+      0,
+      0,
+      -1
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
+    "size": 6.2
+  },
+  "background": {
+    "color": [
+      0,
+      0,
+      0
+    ],
+    "ambient": [
+      0.1,
+      0.1,
+      0.1
+    ]
+  },
+  "light": {
+    "direction": [
+      -0.5,
+      -0.5,
+      -0.5
+    ],
+    "color": [
+      0.9,
+      0.9,
+      0.9
+    ]
+  },
+  "group": [
+    {
+      "sphere": {
+        "center": [
+          -2,
+          2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 0
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          0,
+          2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 1
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          2,
+          2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 2
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          -2,
+          0,
+          0
+        ],
+        "radius": 0.9,
+        "material": 3
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.9,
+        "material": 4
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          2,
+          0,
+          0
+        ],
+        "radius": 0.9,
+        "material": 5
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          -2,
+          -2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 6
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          0,
+          -2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 7
+      }
+    },
+    {
+      "sphere": {
+        "center": [
+          2,
+          -2,
+          0
+        ],
+        "radius": 0.9,
+        "material": 8
+      }
+    }
+  ],
+  "materials": [
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0,
+          0,
+          0
+        ],
+        "exponent": 1
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 1
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 2
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 4.0
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 8.0
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 16
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 32
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 64
+      }
+    },
+    {
+      "phongMaterial": {
+        "diffuseColor": [
+          0.1,
+          0.4,
+          0.1
+        ],
+        "specularColor": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "exponent": 128
+      }
+    }
+  ]
+}

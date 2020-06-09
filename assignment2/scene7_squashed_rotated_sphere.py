@@ -1,10 +1,12 @@
 # CENG 415 Applications of Computer Graphics
-# Assignment 2, Diffuse and Ambient
+# Assignment 2 ,Squashed and rotated sphere
 
 import json
 import numpy as np
 import math
 from PIL import Image
+
+T_MAX = 999.0
 
 
 class Object3D:
@@ -16,11 +18,10 @@ class Object3D:
 
 
 class Sphere(Object3D):
-
     def __init__(self, data):
-        self.radiusSphere = data['group'][0]['sphere']['radius']
-        self.centerSphere = data['group'][0]['sphere']['center']
-        self.color = np.array(data['group'][0]['sphere']['color'])
+        self.radiusSphere = data['sphere']['radius']
+        self.centerSphere = data['sphere']['center']
+        self.color = np.array(data['sphere']['color'])
 
     def intersect(self, ray, hit, tmin=0.01):
         a = 1
@@ -44,12 +45,36 @@ class Sphere(Object3D):
             return t
 
 
+class Transformation(Object3D):
+    def __init__(self, data):
+        self.object = Sphere(data["group"][0]["transform"]["object"])
+        scale = np.append(data["group"][0]["transform"]["transformations"][1]["scale"], 1)
+        scale_matrix = np.array([scale[0], 0, 0, 0, 0, scale[1], 0, 0, 0, 0, scale[2], 0, 0, 0, 0, 1]).reshape(4, 4)
+        zrotate_angle = data["group"][0]["transform"]["transformations"][0]["zrotate"] * math.pi / 180
+        rotate_matrix = np.array([math.cos(zrotate_angle), -math.sin(zrotate_angle), 0, 0,
+                                  math.sin(zrotate_angle), math.cos(zrotate_angle), 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1]).reshape(4, 4)
+        self.m = np.dot(rotate_matrix, scale_matrix)
+
+    def intersect(self, ray, hit=0, tmin=0):
+        inverse_matrix = np.linalg.inv(self.m)
+        new_origin = np.delete(np.dot(inverse_matrix, np.append(ray.origin, 1)), 3)
+        new_dir = np.delete(np.dot(inverse_matrix, np.append(ray.direction, 1)), 3)
+        new_ray_object = Ray(new_origin, new_dir)
+        self.object.intersect(new_ray_object, hit)
+
+
 class Group(Object3D):
+
     def __init__(self):
         self.objects = []
 
-    def intersect(ray, hit=False, tmin=0):
-        pass
+    def addSphere(self, sphere):
+        self.objects.append(sphere)
+
+    def intersect(self, ray, hit, tmin=0):
+        for s in self.objects:
+            s.intersect(ray, hit)
 
 
 class Camera:
@@ -58,7 +83,6 @@ class Camera:
 
 
 class OrthographicCamera(Camera):
-
     def __init__(self, data):
         self.center = np.array(data['orthocamera']['center'])
         self.dir = np.array(data['orthocamera']['direction'])
@@ -66,8 +90,8 @@ class OrthographicCamera(Camera):
         self.size = data['orthocamera']['size']
 
     def generateRay(self, x, y):
-        horizontal = np.cross(self.dir, self.up)
-        return (self.center + (x - 0.5) * self.size * horizontal + (y - 0.5) * self.size * self.up)
+        horizontal = np.cross(self.dir * -1, self.up)
+        return self.center + (x - 0.5) * self.size * horizontal + (y - 0.5) * self.size * self.up
 
 
 class Ray:
@@ -77,19 +101,15 @@ class Ray:
 
 
 class Hit:
-    def __init__(self, t=0, color=(0, 0, 0), normal=0):
+    def __init__(self, t=T_MAX, color=(0, 0, 0), normal=0):
         self.t = t
         self.color = color
         self.normal = normal
 
-    def findNormal(self, x, y, z):
-        magnitude = math.sqrt(x * x + y * y + z * z)
-        return x / magnitude, y / magnitude, z / magnitude
-
 
 # normalization
 def findNormalize(x, y, size):
-    return ((x + 0.5) / size[0], (y + 0.5) / size[1])
+    return (x + 0.5) / size[0], (y + 0.5) / size[1]
 
 
 def normVector(v):
@@ -98,39 +118,35 @@ def normVector(v):
 
 if __name__ == '__main__':
     # read the json file
-    with open('scene2_ambient.json') as f:
+    with open('scene7_squashed_rotated_sphere.json') as f:
         data = json.load(f)
 
-    # variables
-    SIZE = (250, 250)
-
+    SIZE = (100, 100)
     back_color = np.array(data['background']['color'])
     ambient = np.array(data['background']['ambient'])
     light_dir = np.array(data['light']['direction']) * -1
     light_color = np.array(data['light']['color'])
-
     # objects
     orthcam = OrthographicCamera(data)
-    s = Sphere(data)
-    h = Hit()
-
     im = Image.new('RGB', SIZE, tuple(np.array(back_color).dot(255).astype(int)))
-
+    transformedObject = Transformation(data)
     # pixels
     pixel = im.load()
 
     # ray tracing for every pixel
     for i in range(SIZE[0]):
         for j in range(SIZE[1]):
+            hit = Hit()
             x, y = findNormalize(i, j, SIZE)
             r = orthcam.generateRay(x, y)
             ray = Ray(r, orthcam.dir)
-            t = s.intersect(ray, h)
+            transformedObject.intersect(ray, hit)
 
             # make control the t whether there is a hit.
-            if t != -1:
-                pixel_color = np.array(ambient * h.color + max(np.dot(light_dir, h.normal), 0) * h.color * light_color)
+            if hit.t < T_MAX - 1:
+                pixel_color = np.array(
+                    ambient * hit.color + max(np.dot(light_dir, hit.normal), 0) * hit.color * light_color)
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(pixel_color * 255).astype(int))
             else:
                 pixel[i, SIZE[0] - j - 1] = tuple(np.array(ambient * back_color).dot(255).astype(int))
-    im.save("scene2_ambient.jpg")
+    im.save("scene7_squashed_rotated_sphere.jpg")
