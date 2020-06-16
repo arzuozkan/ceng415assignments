@@ -126,7 +126,6 @@ if __name__ == '__main__':
             r = orthcam.generateRay(x, y)
             ray = Ray(r, orthcam.dir)
             t = s.intersect(ray, h)
-
             # make control the t whether there is a hit.
             if t != -1:
                 pixel_color = np.array(ambient * h.color + max(np.dot(light_dir, h.normal), 0) * h.color * light_color)
