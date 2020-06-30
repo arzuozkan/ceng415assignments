@@ -7,6 +7,8 @@ Includes ,working of application computer graphics with python
   <img alt="scene2" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment1/scene2.jpg" width=200px display=flex>
   <img alt="scene2_depth" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment1/scene2_depth.jpg" width=200px>
 </p>
+
+
 # Assignment 2
 <p float="left">
   <img alt="scene1_diffuse" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene1_diffuse.jpg" width=200px>
