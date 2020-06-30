@@ -13,7 +13,7 @@ Includes ,working of application computer graphics with python
 <img alt="scene4_plane" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene4_plane.jpg" width=200px display=flex>
 <img alt="scene5_sphere_triangle" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene5_sphere_triangle.jpg" width=200px display=flex>
 <img alt="scene6_squashed_sphere" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene6_squashed_sphere.jpg" width=200px display=flex>
-<img alt="scene7_squashed_rotated_sphere" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene6_squashed_rotated_sphere.jpg" width=200px display=flex>
+<img alt="scene7_squashed_rotated_sphere" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene7_squashed_rotated_sphere.jpg" width=200px display=flex>
 
 # Assignment 3
 <img alt="scene1_exponent_variations" src="https://github.com/arzuozkan/ceng415assignments/blob/development/assignment2/scene1_exponent_variations.jpg" width=200px display=flex>
